@@ -41,6 +41,8 @@ namespaces = ["google"]
 if "google.cloud" in packages:
     namespaces.append("google.cloud")
 
+print("***** JPB *****)
+    
 setuptools.setup(
     author="Google LLC",
     author_email="cloud-spanner-developers@googlegroups.com",
