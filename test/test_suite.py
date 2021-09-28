@@ -14,11 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import timezone
 import decimal
 import operator
 import os
+import pkg_resources
 import pytest
-import pytz
 from unittest import mock
 
 import sqlalchemy
@@ -48,6 +49,7 @@ from sqlalchemy import String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import Session
+from sqlalchemy.types import ARRAY
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Numeric
 from sqlalchemy.types import Text
@@ -900,6 +902,33 @@ class ComponentReflectionTest(_ComponentReflectionTest):
             assert isinstance(typ, LargeBinary)
             eq_(typ.length, 20)
 
+    @testing.requires.table_reflection
+    def test_array_reflection(self):
+        """Check array columns reflection."""
+        orig_meta = self.metadata
+
+        str_array = ARRAY(String(16))
+        int_array = ARRAY(Integer)
+        Table(
+            "arrays_test",
+            orig_meta,
+            Column("id", Integer, primary_key=True),
+            Column("str_array", str_array),
+            Column("int_array", int_array),
+        )
+        orig_meta.create_all()
+
+        # autoload the table and check its columns reflection
+        tab = Table("arrays_test", orig_meta, autoload=True)
+        col_types = [col.type for col in tab.columns]
+        for type_ in (
+            str_array,
+            int_array,
+        ):
+            assert type_ in col_types
+
+        tab.drop()
+
 
 class CompositeKeyReflectionTest(_CompositeKeyReflectionTest):
     @testing.requires.foreign_key_constraint_reflection
@@ -945,7 +974,7 @@ class RowFetchTest(_RowFetchTest):
 
         eq_(
             row["somelabel"],
-            DatetimeWithNanoseconds(2006, 5, 12, 12, 0, 0, tzinfo=pytz.UTC),
+            DatetimeWithNanoseconds(2006, 5, 12, 12, 0, 0, tzinfo=timezone.utc),
         )
 
 
@@ -1525,3 +1554,23 @@ class InterleavedTablesTest(fixtures.TestBase):
         with mock.patch("google.cloud.spanner_dbapi.cursor.Cursor.execute") as execute:
             client.create(self._engine)
             execute.assert_called_once_with(EXP_QUERY, [])
+
+
+class UserAgentTest(fixtures.TestBase):
+    """Check that SQLAlchemy dialect uses correct user agent."""
+
+    def setUp(self):
+        self._engine = create_engine(
+            "spanner:///projects/appdev-soda-spanner-staging/instances/"
+            "sqlalchemy-dialect-test/databases/compliance-test"
+        )
+        self._metadata = MetaData(bind=self._engine)
+
+    def test_user_agent(self):
+        dist = pkg_resources.get_distribution("sqlalchemy-spanner")
+
+        with self._engine.connect() as connection:
+            assert (
+                connection.connection.instance._client._client_info.user_agent
+                == dist.project_name + "/" + dist.version
+            )
