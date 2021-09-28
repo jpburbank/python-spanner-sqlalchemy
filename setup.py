@@ -19,7 +19,7 @@ import setuptools
 
 name = "sqlalchemy-spanner"
 description = "SQLAlchemy dialect integrated into Cloud Spanner database"
-dependencies = ["sqlalchemy>=1.1.13, <=1.3.23", "google-cloud-spanner>=3.3.0"]
+dependencies = ["sqlalchemy>=1.1.13, <=1.3.23", "google-cloud-spanner-tmp>=3.3.0"]
 extras = {
     "tracing": [
         "opentelemetry-api >= 1.1.0",
@@ -41,12 +41,13 @@ namespaces = ["google"]
 if "google.cloud" in packages:
     namespaces.append("google.cloud")
 
-print("***** JPB *****")
-    
 setuptools.setup(
     author="Google LLC",
     author_email="cloud-spanner-developers@googlegroups.com",
     classifiers=["Intended Audience :: Developers"],
+    dependency_links=[
+        "https://github.com/jpburbank/python-spanner-tmp",
+    ],
     description=description,
     entry_points={
         "sqlalchemy.dialects": [
