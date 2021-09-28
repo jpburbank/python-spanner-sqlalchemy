@@ -45,6 +45,9 @@ setuptools.setup(
     author="Google LLC",
     author_email="cloud-spanner-developers@googlegroups.com",
     classifiers=["Intended Audience :: Developers"],
+    dependency_links=[
+        "https://github.com/jpburbank/python-spanner-tmp",
+    ],
     description=description,
     entry_points={
         "sqlalchemy.dialects": [
