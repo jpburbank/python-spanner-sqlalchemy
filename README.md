@@ -1,4 +1,4 @@
-# This is a fork
+# THIS IS A FORK
 This exists for the sole reason to be able to redefine a dependency to use a different repo's fork with a bug fix in it. Waiting on corporate to sign a CLA so that a PR may be made. Once that has been accepted, this fork will be deleted and so will the other with the fix.
 
 # Spanner dialect for SQLAlchemy
