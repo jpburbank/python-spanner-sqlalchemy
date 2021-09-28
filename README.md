@@ -1,3 +1,5 @@
+# This is a fork for the sole reason to be able to use a different repo fork with a bug fix in it. Waiting on corporate to sign a CLA so that a PR may be made. Once that has been accepted, this fork will be deleted and so will the other with the fix.
+
 # Spanner dialect for SQLAlchemy
 
 Spanner dialect for SQLAlchemy represents an interface API designed to make it possible to control Cloud Spanner databases with SQLAlchemy API. The dialect is built on top of [the Spanner DB API](https://github.com/googleapis/python-spanner/tree/master/google/cloud/spanner_dbapi), which is designed in accordance with [PEP-249](https://www.python.org/dev/peps/pep-0249/).
